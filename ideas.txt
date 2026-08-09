@@ -1,0 +1,319 @@
+# Boty — Hoja de Ruta Técnica
+
+Hoja de ruta clara, escalable y alineada con buenas prácticas de arquitectura moderna para construir **"Boty"** desde cero hasta nivel industrial.
+
+## Índice
+
+1. [Nivel Básico (MVP / Prototipo Rápido)](#1-nivel-basico-mvp--prototipo-rapido)
+2. [Nivel Medio (Aplicación Funcional con Persistencia)](#2-nivel-medio-aplicacion-funcional-con-persistencia)
+3. [Nivel Difícil / Avanzado (Escalable, Agéntico e Industrial)](#3-nivel-dificil--avanzado-escalable-agéntico-e-industrial)
+4. [Recomendación Final](#4-recomendación-final)
+
+---
+
+# 1. Nivel Básico (MVP / Prototipo Rápido)
+
+## Estructura y Arquitectura
+
+* Arquitectura **monolítica simple**
+* Flujo:
+
+  ```
+  Usuario → Input → API LLM → Respuesta → Usuario
+  ```
+
+* Sin separación estricta de capas
+* Uso de **webhooks o funciones serverless**
+* Sin memoria persistente (o muy básica)
+
+---
+
+## Tecnologías y Herramientas
+
+### Lenguajes
+
+* JavaScript (Node.js) o Python
+
+### Plataformas Low-Code / No-Code
+
+* **n8n** (muy recomendado para ti)
+* **Make (Integromat)**
+* **Dialogflow (Google)**
+* **Botpress**
+
+### IA / APIs
+
+* Veremos (buscar otras opciones más adelante)
+
+### Almacenamiento
+
+* JSON local
+* SQLite (opcional)
+
+---
+
+## Metodologías de Desarrollo
+
+### Metodología
+
+* **Kanban (rápido y flexible)**
+
+### Hitos (2–5 días)
+
+1. Definir propósito de Boty (ej: soporte técnico, asistente personal)
+2. Crear flujo básico (input → respuesta)
+3. Integrar API LLM
+4. Crear interfaz simple:
+
+   * CLI / Web básica / WhatsApp (Twilio)
+5. Pruebas manuales
+6. Deploy simple (Render / Vercel)
+
+---
+
+# 2. Nivel Medio (Aplicación Funcional con Persistencia)
+
+## Estructura y Arquitectura
+
+* Arquitectura **Cliente-Servidor**
+* Separación clara:
+
+  ```
+  Frontend → API Backend → LLM + DB
+  ```
+
+* Manejo de estado de conversación
+* API REST o WebSockets
+* Introducción de **memoria contextual**
+
+---
+
+## Tecnologías y Herramientas
+
+### Frontend
+
+*(Te recomiendo React por tu stack actual)*
+
+* React + Vite + TypeScript
+* Bootstrap o Tailwind
+* Alternativa escritorio:
+
+  * Electron / Tauri
+  * Python: Tkinter / CustomTkinter
+
+---
+
+### Backend
+
+* Node.js + Express (ideal para ti)
+* Alternativa: Python + FastAPI
+
+---
+
+### Base de Datos
+
+* PostgreSQL (recomendado)
+* MongoDB (si quieres flexibilidad)
+
+**Modelos básicos:**
+
+* Usuarios
+* Conversaciones
+* Mensajes
+
+---
+
+### IA y PNL
+
+* Veremos (buscar otras opciones más adelante)
+
+---
+
+### Búsqueda Vectorial (básica)
+
+* ChromaDB
+* PGVector (si usas PostgreSQL)
+
+---
+
+## Metodologías de Desarrollo
+
+### Metodología
+
+* Scrum o Kanban
+
+### Buenas prácticas
+
+* Git + GitHub
+* Diseño de API REST
+* Pruebas unitarias básicas
+* Manejo de errores y logs
+
+### Hitos (2–4 semanas)
+
+1. Diseñar arquitectura cliente-servidor
+2. Implementar backend API
+3. Crear frontend tipo chat
+4. Persistencia de conversaciones
+5. Integrar RAG básico
+6. Autenticación (JWT)
+7. Deploy completo (Frontend + Backend)
+
+---
+
+# 3. Nivel Difícil / Avanzado (Escalable, Agéntico e Industrial)
+
+## Estructura y Arquitectura
+
+* Arquitectura **basada en microservicios**
+* Sistema **orientado a eventos**
+* Pipeline:
+
+  ```
+  Usuario → Gateway → Orquestador → Agentes → LLM → Memoria → Respuesta
+  ```
+
+* Sistema **Multi-Agente**
+* Memoria:
+
+  * Corto plazo (contexto)
+  * Largo plazo (vector DB)
+
+---
+
+## Tecnologías y Herramientas
+
+### Orquestación de Agentes
+
+* AutoGen
+* CrewAI
+* LangGraph (**muy potente y moderno**)
+
+---
+
+### Bases de Datos Vectoriales
+
+* Pinecone (cloud)
+* Qdrant
+* ChromaDB
+* PGVector
+
+---
+
+### Backend / Microservicios
+
+* Node.js / Python (FastAPI)
+* API Gateway
+
+---
+
+### Infraestructura y DevOps
+
+* Docker
+* Kubernetes
+* CI/CD (GitHub Actions)
+* Observabilidad:
+
+  * LangSmith
+  * Phoenix (Arize)
+
+---
+
+### Procesamiento y Mensajería
+
+* Redis (caching + colas)
+* RabbitMQ / Kafka
+
+---
+
+### Despliegue
+
+* AWS / GCP
+* Vercel (frontend)
+* Render / Railway (backend simple)
+
+---
+
+### Seguridad y Control
+
+* Guardrails:
+
+  * NeMo Guardrails
+* Moderación:
+
+  * OpenAI moderation API
+* Rate limiting
+* Control de contexto
+
+---
+
+## Metodologías de Desarrollo
+
+### Enfoque
+
+* **MLOps / LLMOps**
+
+### Prácticas clave
+
+* TDD (Test Driven Development)
+* Evaluación de respuestas (Evals)
+* Versionado de prompts
+* Observabilidad de modelos
+
+### Hitos (2–3 meses+)
+
+1. Diseño de microservicios
+2. Sistema multi-agente
+3. Integración de memoria avanzada
+4. Escalabilidad (Kubernetes)
+5. Observabilidad LLM
+6. Seguridad y gobernanza
+
+---
+
+# 4. Recomendación Final (Muy Importante)
+
+Dado tu perfil (**junior + frontend + Node + interés en IA**)
+
+**Empieza por el NIVEL MEDIO, pero con mentalidad de MVP**
+
+## ¿Por qué?
+
+* El nivel básico es muy limitado (no escalable)
+* El nivel medio:
+
+  * Ya es profesional
+  * Puedes usarlo en tu portafolio
+  * Es escalable hacia el nivel avanzado
+
+---
+
+## Ruta recomendada para ti
+
+1. **Semana 1**
+
+   * React + chat UI
+   * Backend Express + OpenAI
+
+2. **Semana 2**
+
+   * PostgreSQL + historial
+   * Autenticación
+
+3. **Semana 3**
+
+   * RAG básico (LangChain + PDFs o docs)
+
+4. **Semana 4**
+
+   * Deploy completo (Render + Vercel)
+
+---
+
+## Visión a futuro
+
+Luego puedes evolucionar a:
+
+* Agentes (CrewAI)
+* Memoria avanzada (vector DB)
+* Automatización (n8n)
