@@ -58,9 +58,9 @@ Frontend → API Backend → LLM + DB
 * PostgreSQL
 * Git + GitHub
 
-## Cómo empezar (próximamente)
+## Cómo empezar
 
-> Las carpetas ya están creadas. Los archivos de configuración y código se agregarán en los próximos pasos.
+> Proyecto con backend y frontend ya funcionales (chat con IA básico sin persistencia).
 
 ### Instalación
 

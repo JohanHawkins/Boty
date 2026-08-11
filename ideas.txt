@@ -2,6 +2,28 @@
 
 Hoja de ruta clara, escalable y alineada con buenas prácticas de arquitectura moderna para construir **"Boty"** desde cero hasta nivel industrial.
 
+## Estado actual del proyecto
+
+> Actualizado: se está en el **Nivel Medio** (aplicación funcional con persistencia), con la base del chat IA ya funcionando.
+
+**En producción (funciona):**
+
+* [x] Frontend React + Vite + TypeScript con chat UI (`Chat`, `ChatInput`, `Message`)
+* [x] Backend Node.js + Express + TypeScript (capa de rutas/controllers/services/middleware)
+* [x] Endpoint `POST /api/chat` (REST) con historial de conversación en memoria (contexto de sesión)
+* [x] Endpoint `GET /health`
+* [x] Integración LLM vía API compatible con OpenAI (configurable por `.env`: `LLM_API_KEY`, `LLM_MODEL`, `LLM_API_URL`)
+* [x] Manejo de errores (`HttpError`, error handler), logs y validación de entrada
+* [x] Pruebas unitarias básicas (vitest: `tests/chat.test.ts`)
+* [x] Arquitectura cliente-servidor con Vite proxy en desarrollo
+
+**Pendiente (próximos pasos):**
+
+* [ ] Persistencia PostgreSQL (Usuarios, Conversaciones, Mensajes)
+* [ ] Autenticación (JWT)
+* [ ] RAG básico (LangChain + PDFs o docs)
+* [ ] Deploy completo (Frontend + Backend)
+
 ## Índice
 
 1. [Nivel Básico (MVP / Prototipo Rápido)](#1-nivel-basico-mvp--prototipo-rapido)
@@ -151,13 +173,15 @@ Hoja de ruta clara, escalable y alineada con buenas prácticas de arquitectura m
 
 ### Hitos (2–4 semanas)
 
-1. Diseñar arquitectura cliente-servidor
-2. Implementar backend API
-3. Crear frontend tipo chat
-4. Persistencia de conversaciones
-5. Integrar RAG básico
-6. Autenticación (JWT)
-7. Deploy completo (Frontend + Backend)
+1. [x] Diseñar arquitectura cliente-servidor
+2. [x] Implementar backend API
+3. [x] Crear frontend tipo chat
+4. [ ] Persistencia de conversaciones (PostgreSQL)
+5. [ ] Integrar RAG básico
+6. [ ] Autenticación (JWT)
+7. [ ] Deploy completo (Frontend + Backend)
+
+> Nota: hoy la "memoria contextual" es por sesión (historial en memoria del frontend). El siguiente paso natural es persistirla en PostgreSQL y enviar el historial desde el backend.
 
 ---
 
@@ -290,23 +314,23 @@ Dado tu perfil (**junior + frontend + Node + interés en IA**)
 
 ## Ruta recomendada para ti
 
-1. **Semana 1**
+1. **Semana 1** *(completada)*
 
-   * React + chat UI
-   * Backend Express + OpenAI
+   * [x] React + chat UI
+   * [x] Backend Express + OpenAI
 
 2. **Semana 2**
 
-   * PostgreSQL + historial
-   * Autenticación
+   * [ ] PostgreSQL + historial
+   * [ ] Autenticación
 
 3. **Semana 3**
 
-   * RAG básico (LangChain + PDFs o docs)
+   * [ ] RAG básico (LangChain + PDFs o docs)
 
 4. **Semana 4**
 
-   * Deploy completo (Render + Vercel)
+   * [ ] Deploy completo (Render + Vercel)
 
 ---
 
