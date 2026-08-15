@@ -13,8 +13,11 @@ Hoja de ruta clara, escalable y alineada con buenas prácticas de arquitectura m
 * [x] Endpoint `POST /api/chat` (REST) con historial de conversación en memoria (contexto de sesión)
 * [x] Endpoint `GET /health`
 * [x] Integración LLM vía API compatible con OpenAI (configurable por `.env`: `LLM_API_KEY`, `LLM_MODEL`, `LLM_API_URL`)
+* [x] **Modo demo sin API key** (`LLM_MODE=demo`): respuestas simuladas por intenciones básicas (saludo, quién es, ayuda). Auto-detecta: sin key → demo, con key → live. Tests en `tests/llm.test.ts`
+* [x] **Opciones seleccionables**: el saludo devuelve 3 opciones (`Gestion de Correos y Contraseñas`, `Recordatorios`, `Guardar informacion`); el frontend las muestra como botones y al pulsarlos se envía el texto de la opción como mensaje del usuario
+* [x] **Detección de intenciones centralizada** en `services/intent.ts` (tokenización + banco de palabras clave, insensible a mayúsculas y tildes) y conectada al modo demo. Tests en `tests/intent.test.ts`
 * [x] Manejo de errores (`HttpError`, error handler), logs y validación de entrada
-* [x] Pruebas unitarias básicas (vitest: `tests/chat.test.ts`)
+* [x] Pruebas unitarias básicas (vitest: `tests/chat.test.ts` + `tests/llm.test.ts`)
 * [x] Arquitectura cliente-servidor con Vite proxy en desarrollo
 
 **Pendiente (próximos pasos):**
@@ -182,6 +185,10 @@ Hoja de ruta clara, escalable y alineada con buenas prácticas de arquitectura m
 7. [ ] Deploy completo (Frontend + Backend)
 
 > Nota: hoy la "memoria contextual" es por sesión (historial en memoria del frontend). El siguiente paso natural es persistirla en PostgreSQL y enviar el historial desde el backend.
+>
+> Nota 2: Boty funciona sin ninguna API key gracias al **modo demo** (`LLM_MODE=demo`). Para usar IA real solo se necesita un proveedor OpenAI-compatible (OpenAI, Ollama local, etc.).
+>
+> Nota 3: el saludo en modo demo ofrece **3 opciones seleccionables** (botones en el frontend). Al pulsar una, se envía como mensaje del usuario y el bot responde según la intención detectada.
 
 ---
 
@@ -341,3 +348,36 @@ Luego puedes evolucionar a:
 * Agentes (CrewAI)
 * Memoria avanzada (vector DB)
 * Automatización (n8n)
+
+---
+
+# 5. Caso de Estudio: Analizador de Frases por Palabras Clave
+
+> Modo demo: el backend identifica intenciones por palabras clave y ejecuta acciones según la frase del usuario.
+>
+> **Estado: implementado** en `backend/src/services/intent.ts` (normalización sin tildes, tokenización, banco de palabras → acciones, caso por defecto) y conectado al modo demo (`backend/src/services/llm.ts`). Tests en `tests/intent.test.ts`.
+
+Escribe un código [especifica el lenguaje, ej. en Python / JavaScript / C#] que analice una frase de texto ingresada por el usuario y ejecute acciones automáticas según las palabras encontradas.
+
+El programa debe cumplir con los siguientes requerimientos:
+
+1. Entrada de texto: Recibir una frase o cadena de texto (string).
+2. Procesamiento de texto:
+   - Convertir la frase a minúsculas.
+   - Limpiar signos de puntuación.
+   - Dividir la frase en palabras individuales (tokens).
+3. Banco de palabras y acciones (Diccionario / Mapa):
+   - Definir un conjunto de palabras clave mapeadas a funciones o acciones específicas.
+   - Ejemplo de palabras clave y sus acciones:
+     * Si contiene "hola" o "buenos días": Ejecutar función `saludar()` -> Imprimir "¡Hola! ¿En qué puedo ayudarte?".
+     * Si contiene "precio" o "costo": Ejecutar función `mostrar_precios()` -> Imprimir "Nuestros precios inician en...".
+     * Si contiene "soporte" o "ayuda": Ejecutar función `contactar_soporte()` -> Imprimir "Transfiriendo con un agente...".
+     * Si contiene "adios" o "salir": Ejecutar función `despedir()` -> Imprimir "¡Hasta luego!".
+4. Comparación y ejecución:
+   - Iterar sobre las palabras de la frase.
+   - Compararlas contra el banco de palabras clave.
+   - Si se detecta una coincidencia, llamar e invocar la acción/función correspondiente.
+   - Manejar el caso por defecto: Si ninguna palabra coincide, mostrar un mensaje indicando que no se reconoció el comando.
+5. Estructura del código:
+   - Mantener el código modular, usando funciones claras para cada acción.
+   - Incluir comentarios breves que expliquen el flujo de tokenización y comparación.

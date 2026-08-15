@@ -50,4 +50,23 @@ describe('chat controller', () => {
       model: 'gpt-4o-mini',
     });
   });
+
+  it('incluye "options" en la respuesta cuando el LLM las devuelve', async () => {
+    const res = mockRes();
+    const options = ['Gestion de Correos y Contraseñas', 'Recordatorios', 'Guardar informacion'];
+    mockedGenerate.mockResolvedValue({
+      content: '¡Hola!',
+      model: 'demo-mode',
+      options,
+    });
+
+    await chat({ body: { messages: [{ role: 'user', content: 'hola' }] } } as never, res);
+
+    expect(res.json).toHaveBeenCalledWith({
+      role: 'assistant',
+      content: '¡Hola!',
+      model: 'demo-mode',
+      options,
+    });
+  });
 });

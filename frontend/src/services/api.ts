@@ -12,5 +12,12 @@ export async function sendChat(messages: ChatMessage[]): Promise<ChatMessage> {
     throw new Error(body?.error || `Error del servidor (${res.status})`);
   }
 
-  return (await res.json()) as ChatMessage;
+  const data = (await res.json()) as {
+    role: 'assistant';
+    content: string;
+    model: string;
+    options?: string[];
+  };
+
+  return { role: data.role, content: data.content, options: data.options };
 }

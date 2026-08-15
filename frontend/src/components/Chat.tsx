@@ -27,7 +27,12 @@ export function Chat({ messages, isLoading, error, onSend }: ChatProps) {
           </div>
         )}
         {messages.map((m, i) => (
-          <Message key={i} message={m} />
+          <Message
+            key={i}
+            message={m}
+            onSelectOption={onSend}
+            disabled={isLoading}
+          />
         ))}
         {isLoading && (
           <div className="message message--bot">

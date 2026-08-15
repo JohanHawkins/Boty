@@ -31,5 +31,6 @@ export async function chat(req: Request, res: Response): Promise<void> {
     role: 'assistant',
     content: result.content,
     model: result.model,
+    ...(result.options ? { options: result.options } : {}),
   });
 }
