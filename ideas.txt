@@ -16,14 +16,15 @@ Hoja de ruta clara, escalable y alineada con buenas prácticas de arquitectura m
 * [x] **Modo demo sin API key** (`LLM_MODE=demo`): respuestas simuladas por intenciones básicas (saludo, quién es, ayuda). Auto-detecta: sin key → demo, con key → live. Tests en `tests/llm.test.ts`
 * [x] **Opciones seleccionables**: el saludo devuelve 3 opciones (`Gestion de Correos y Contraseñas`, `Recordatorios`, `Guardar informacion`); el frontend las muestra como botones y al pulsarlos se envía el texto de la opción como mensaje del usuario
 * [x] **Detección de intenciones centralizada** en `services/intent.ts` (tokenización + banco de palabras clave, insensible a mayúsculas y tildes) y conectada al modo demo. Tests en `tests/intent.test.ts`
+* [x] **Registro de usuarios**: PostgreSQL (`pg`) con tabla `users`, hash scrypt de contraseñas y endpoint `POST /api/auth/register`. La BD es opcional (si no está disponible, el modo demo sigue funcionando). Tests en `tests/auth.service.test.ts` + `tests/auth.controller.test.ts`
 * [x] Manejo de errores (`HttpError`, error handler), logs y validación de entrada
 * [x] Pruebas unitarias básicas (vitest: `tests/chat.test.ts` + `tests/llm.test.ts`)
 * [x] Arquitectura cliente-servidor con Vite proxy en desarrollo
 
 **Pendiente (próximos pasos):**
 
-* [ ] Persistencia PostgreSQL (Usuarios, Conversaciones, Mensajes)
-* [ ] Autenticación (JWT)
+* [ ] Autenticación completa (JWT) + login
+* [ ] Persistencia de Conversaciones y Mensajes (asociados al usuario)
 * [ ] RAG básico (LangChain + PDFs o docs)
 * [ ] Deploy completo (Frontend + Backend)
 

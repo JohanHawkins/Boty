@@ -9,12 +9,13 @@ Frontend (React + Vite + TS)          Backend (Express + TS)
 ┌─────────────────────────────┐      ┌──────────────────────────────────────┐
 │ ChatPage                    │      │ routes/  → controllers/ → services/  │
 │  ├─ useChat (estado)        │      │   /api/chat  chat.ts        llm.ts   │
-│  ├─ Chat                    │ ───▶ │   /health    (validación)  intent.ts │
-│  │   ├─ Message (+options)  │  POST│                      config/ (.env)  │
-│  │   └─ ChatInput           │      │ middleware/ (error, logger)          │
-└─────────────────────────────┘      └──────────────────────────────────────┘
-                ▲                                     │
-                └────────────── respuesta JSON ◀──────┘
+│  ├─ Chat                    │ ───▶ │   /api/auth  auth.ts        intent.ts│
+│  │   ├─ Message (+options)  │ POST │   /health            config/ (.env)  │
+│  │   └─ ChatInput           │      │                    models/ → db/pool │
+└─────────────────────────────┘      │ middleware/ (error, logger)          │
+                ▲                    └───────────────┬──────────────────────┘
+                └────────────── respuesta JSON ◀─────┘
+                                            PostgreSQL (tabla users)
 ```
 
 ## Flujo de un mensaje (modo demo)
@@ -46,12 +47,32 @@ Frontend (React + Vite + TS)          Backend (Express + TS)
 
 | Carpeta        | Contenido                                                          |
 | -------------- | ------------------------------------------------------------------ |
-| `config/`      | `index.ts` (variables de entorno: puerto, LLM)                     |
-| `controllers/` | `chat.ts` (validación del request y respuesta)                     |
+| `config/`      | `index.ts` (variables de entorno: puerto, BD, LLM)                 |
+| `controllers/` | `chat.ts` (validación del request y respuesta), `auth.ts` (registro)|
+| `db/`          | `index.ts` (pool de PostgreSQL + `initDb`)                         |
 | `middleware/`  | `error.ts` (`HttpError`, handlers), `logger.ts`                    |
-| `routes/`      | `chat.ts` (`POST /api/chat`), `health.ts` (`GET /health`)          |
-| `services/`    | `llm.ts` (modo demo/live), `intent.ts` (detección de intenciones)  |
+| `models/`      | `user.ts` (acceso a la tabla `users`)                              |
+| `routes/`      | `chat.ts`, `auth.ts`, `health.ts`                                  |
+| `services/`    | `llm.ts` (modo demo/live), `intent.ts`, `auth.ts` (hash + registro)|
 | `utils/`       | `asyncHandler.ts`                                                  |
+
+## Registro de usuarios
+
+El flujo de registro se apoya en una tabla `users` en PostgreSQL (creada automáticamente en el arranque por `initDb`):
+
+```sql
+CREATE TABLE IF NOT EXISTS users (
+  id SERIAL PRIMARY KEY,
+  username VARCHAR(50) UNIQUE NOT NULL,
+  password_hash VARCHAR(255) NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+```
+
+* `services/auth.ts` hashea la contraseña con **scrypt** (sal aleatoria por usuario, `salt:hash` en hex).
+* `models/user.ts` expone `createUser` y `findUserByUsername`.
+* `POST /api/auth/register` recibe `{ username, password }` y responde `201` con los datos del usuario (sin la contraseña).
+* La conexión es opcional: si la BD no está disponible, el servidor arranca igual y solo fallan las operaciones que la usan.
 
 ## Contratos de API
 
@@ -83,8 +104,24 @@ Respuesta (200):
 { "status": "ok", "uptime": 123.45 }
 ```
 
+### `POST /api/auth/register`
+
+Body:
+
+```json
+{ "username": "ana", "password": "1234" }
+```
+
+Respuesta (201):
+
+```json
+{ "id": 1, "username": "ana", "createdAt": "2026-01-01T00:00:00.000Z" }
+```
+
+Errores: `400` (campos faltantes o inválidos), `409` (username en uso).
+
 ## Cómo extender
 
 * **Nueva intención en modo demo**: agrega una entrada a `intentBank` en `services/intent.ts` (palabras clave + respuesta + opciones opcionales).
 * **Conectar un LLM real**: configura `LLM_MODE=live` y las variables `LLM_API_KEY`/`LLM_MODEL`/`LLM_API_URL` en `backend/.env`.
-* **Persistencia (siguiente paso)**: agregar PostgreSQL con modelos Usuarios/Conversaciones/Mensajes y reemplazar el historial en memoria del frontend por el historial del backend.
+* **Autenticación (siguiente paso)**: emitir un JWT tras el registro/login y proteger los endpoints; luego persistir conversaciones y mensajes asociados al usuario.
