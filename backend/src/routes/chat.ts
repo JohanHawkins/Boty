@@ -4,6 +4,6 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 
 const router = Router();
 
-router.post('/chat', asyncHandler(chat));
+router.post('/', asyncHandler(chat));
 
 export default router;
