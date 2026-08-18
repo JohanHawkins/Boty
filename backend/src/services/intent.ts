@@ -4,6 +4,9 @@ interface IntentAction {
   options?: string[];
 }
 
+const pedirCredenciales = (): string =>
+  'Por favor, dime tu nombre de usuario y tu acceso. Si no lo tienes, dímelo y lo creamos.';
+
 const intentBank: Record<string, IntentAction> = {
   saludar: {
     keywords: ['hola', 'buenas', 'buenos dias', 'hey', 'hi', 'hello', 'saludos', 'que tal'],
@@ -22,6 +25,53 @@ const intentBank: Record<string, IntentAction> = {
     keywords: ['gracias', 'thank', 'te aprecio'],
     run: () => '¡De nada! Cuando conectes un modelo real podré ayudarte con mucho más.',
   },
+  registrar_usuario: {
+    keywords: [
+      'no lo tengo',
+      'no tengo',
+      'no tengo cuenta',
+      'crear cuenta',
+      'crearme una cuenta',
+      'registrarme',
+      'registrarse',
+      'registrar',
+      'registro',
+      'nuevo usuario',
+      'no',
+    ],
+    run: () => '¡Perfecto! Vamos a crear tu cuenta. Dime tu nombre de usuario para registrarte.',
+  },
+  proporcionar_credenciales: {
+    keywords: [
+      'usuario y acceso',
+      'usuario y clave',
+      'usuario y contrasena',
+      'mi usuario',
+      'mi clave',
+      'mi acceso',
+      'mi contrasena',
+      'usuario',
+      'clave',
+      'acceso',
+      'contrasena',
+    ],
+    run: () => 'Déjame verificar tu usuario y tu acceso.',
+  },
+  guardar_contrasena: {
+    keywords: ['guardar contrasena', 'guardar contrasenas'],
+    run: () => 'Dime qué quieres guardar.',
+  },
+  ver_contrasenas: {
+    keywords: [
+      'contrasenas guardadas',
+      'ver contrasenas',
+      'ver mis contrasenas',
+      'mis contrasenas',
+      'listar contrasenas',
+      'consultar contrasenas',
+    ],
+    run: () => 'Te muestro tus contraseñas guardadas.',
+  },
   gestionar_correos: {
     keywords: [
       'gestion de correos',
@@ -30,15 +80,15 @@ const intentBank: Record<string, IntentAction> = {
       'contrasenas',
       'contra',
     ],
-    run: () => 'Puedo ayudarte a guardar y consultar tus correos y contraseñas. En el modo demo no persisto nada aún, pero con PostgreSQL podré guardarlos de forma segura.',
+    run: pedirCredenciales,
   },
   recordatorios: {
     keywords: ['recordatorio', 'recordatorios', 'recordar', 'alarma', 'recordame', 'recuerdame'],
-    run: () => 'Claro, puedo crear recordatorios por ti. En este modo demo aún no tengo persistencia, pero con la base de datos podrás agendar y consultar recordatorios.',
+    run: pedirCredenciales,
   },
   guardar_informacion: {
     keywords: ['guardar informacion', 'guardar'],
-    run: () => 'Perfecto, puedo guardar información para ti. Aún estoy en modo demo, así que no la persisto, pero pronto podré almacenarla en la base de datos.',
+    run: pedirCredenciales,
   },
 };
 
@@ -54,6 +104,44 @@ function tokenize(text: string): string[] {
   return normalize(text)
     .split(/\s+/)
     .filter(Boolean);
+}
+
+const CREDENTIAL_STOPWORDS = new Set([
+  'mi',
+  'mis',
+  'usuario',
+  'usuarios',
+  'clave',
+  'acceso',
+  'contrasena',
+  'contrasenas',
+  'es',
+  'son',
+  'y',
+  'la',
+  'el',
+  'los',
+  'las',
+  'de',
+  'del',
+  'para',
+  'por',
+  'que',
+  'con',
+]);
+
+export function parseCredentials(
+  text: string,
+  options?: { exactTokens?: boolean }
+): { username: string; password: string } | null {
+  const tokens = tokenize(text).filter((token) => !CREDENTIAL_STOPWORDS.has(token));
+  if (options?.exactTokens ? tokens.length !== 2 : tokens.length < 2) {
+    return null;
+  }
+  return {
+    username: tokens[0],
+    password: tokens.slice(1).join(''),
+  };
 }
 
 export function detectIntent(
