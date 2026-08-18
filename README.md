@@ -10,6 +10,8 @@ Actualmente **ya funciona** un chat completo: frontend de chat con historial por
 * Backend Node.js + Express + TypeScript (rutas/controllers/services/middleware)
 * `POST /api/chat` (REST) con historial de conversación en memoria (contexto de sesión)
 * `GET /health`
+* `POST /api/auth/register` para crear usuarios (hash scrypt de la contraseña, sin clave en texto plano)
+* **Persistencia PostgreSQL** (tabla `users`) mediante `pg`, con conexión opcional: si la BD no está disponible, el modo demo sigue funcionando
 * Integración LLM vía API compatible con OpenAI, configurable por `.env` (`LLM_API_KEY`, `LLM_MODEL`, `LLM_API_URL`); compatible también con Ollama local
 * **Modo demo sin API key** (`LLM_MODE=demo`): respuestas por intenciones, con **3 opciones seleccionables** en el saludo que se envían como mensaje del usuario al pulsarlas
 * Detección de intenciones centralizada (tokenización + banco de palabras, insensible a mayúsculas y tildes) en `services/intent.ts`
@@ -24,6 +26,7 @@ Actualmente **ya funciona** un chat completo: frontend de chat con historial por
 | Frontend  | React + Vite + TypeScript               |
 | Estilos   | CSS propio (`src/assets/global.css`)    |
 | Backend   | Node.js + Express + TypeScript          |
+| Base datos| PostgreSQL (`pg`)                       |
 | IA        | API OpenAI-compatible (o modo demo)     |
 | Tests     | Vitest                                  |
 
@@ -43,10 +46,12 @@ Boty/
 ├── backend/                   # Node.js + Express + TypeScript
 │   ├── src/
 │   │   ├── config/            # Configuración desde variables de entorno
-│   │   ├── controllers/       # chat.ts (validación y respuesta HTTP)
+│   │   ├── controllers/       # chat.ts, auth.ts (validación y respuesta HTTP)
+│   │   ├── db/                # pool de PostgreSQL + initDb (tabla users)
 │   │   ├── middleware/        # error.ts, logger.ts
-│   │   ├── routes/            # chat.ts, health.ts
-│   │   ├── services/          # llm.ts (modo demo/live), intent.ts (intenciones)
+│   │   ├── models/            # user.ts (acceso a la tabla users)
+│   │   ├── routes/            # chat.ts, auth.ts, health.ts
+│   │   ├── services/          # llm.ts (modo demo/live), intent.ts, auth.ts
 │   │   └── utils/             # asyncHandler.ts
 │   └── tests/                 # Pruebas unitarias (Vitest)
 ├── docs/                      # Documentación del proyecto
@@ -67,9 +72,8 @@ Frontend (React) → API Backend (Express) → LLM + Detección de intenciones
 ## Requisitos previos
 
 * Node.js 18+
+* PostgreSQL (para el registro de usuarios; el chat demo funciona sin BD)
 * Git
-
-> PostgreSQL es el siguiente paso planificado (persistencia), aún no es necesario para correr el proyecto.
 
 ## Cómo empezar
 
@@ -95,6 +99,7 @@ Variables de entorno (`backend/.env`):
 | --------------- | ------------------------------------------------------- | ------------------------------------ |
 | `PORT`          | Puerto del servidor                                     | `3000`                               |
 | `NODE_ENV`      | Entorno                                                 | `development`                        |
+| `DATABASE_URL`  | Conexión a PostgreSQL (`postgres://user:pass@host:5432/db`) | `postgres://postgres:postgres@localhost:5432/boty` |
 | `LLM_MODE`      | `demo` (simulado) o `live` (LLM real)                   | auto: demo sin key, live con key     |
 | `LLM_API_KEY`   | Clave del proveedor LLM (solo en `live`)                | `tu_api_key_aqui`                    |
 | `LLM_MODEL`     | Modelo del proveedor                                    | `gpt-4o-mini`                        |
@@ -121,10 +126,8 @@ cd frontend && npm run build
 
 Ver `ideas.txt` para la guía completa de niveles y evolución:
 
-1. **Completado** — React + chat UI, Backend Express + IA (modo demo y live)
-2. **Siguiente** — PostgreSQL + historial, Autenticación (JWT)
-3. — RAG básico (docs/PDFs)
-4. — Deploy completo (Frontend + Backend)
+1. **Completado** — React + chat UI, Backend Express + IA (modo demo y live), opciones seleccionables, detección de intenciones, PostgreSQL (tabla `users`) y registro de usuarios
+2. **Siguiente** — Autenticación (JWT), historial de conversaciones persistido, RAG, deploy
 
 ## Visión a futuro
 
